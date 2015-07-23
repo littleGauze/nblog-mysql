@@ -28,7 +28,7 @@ function MainPort($params){
 						$userinfo = $users->findUserByName($username);
 						if($userinfo){
 							if($userinfo['user_pass'] == md5($userpass)){
-								returnMsg(200, '登陆成功！', array('userinfo'=>$userinfo));
+								returnMsg(200, '登陆成功！正在跳转...', array('userinfo'=>$userinfo));
 							}else{
 								returnMsg(201, '密码错误！');
 							}
@@ -38,6 +38,15 @@ function MainPort($params){
 						
 						break;
 					case 'REGISTER':
+						$params = array(
+								'username'=> $username,
+								'userpass'=> $userpass
+						);
+							
+						$rs = $users->register($params);
+						 if($rs){
+							returnMsg(200, '注册成功！have fun');
+							}
 						break;
 					default: 
 						break;
@@ -46,15 +55,6 @@ function MainPort($params){
 			}else{
 				returnMsg(405, '参数错误!');
 			}
-			$params = array(
-				'username'=> $username,
-				'userpass'=> $userpass
-			);
-			
-			/* $rs = $users->register($params);
-			if($rs){
-				returnMsg(200, '注册成功！have fun'); 
-			} */
 			break;
 		default: 
 			break;
