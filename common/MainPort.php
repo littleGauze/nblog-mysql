@@ -16,13 +16,17 @@ function MainPort($params){
 			$users = new Users();
 			
 			$action = isset($params['action'])?$params['action']:"";
-			$username = isset($params['username'])?$params['username']:"";
-			$userpass = isset($params['userpass'])?$params['userpass']:"";
 			
-			if(!empty($action) && !empty($username) && !empty($userpass)){
+			if(!empty($action)){
 				
 				switch ($action){
 					case 'LOGIN':
+						$username = isset($params['username'])?$params['username']:"";
+						$userpass = isset($params['userpass'])?$params['userpass']:"";
+						
+						if(empty($username) && empty($userpass)){
+							returnMsg(405, '参数错误!');
+						}
 						
 						//查询用户
 						$userinfo = $users->findUserByName($username);
@@ -38,6 +42,14 @@ function MainPort($params){
 						
 						break;
 					case 'REGISTER':
+						
+						$username = isset($params['username'])?$params['username']:"";
+						$userpass = isset($params['userpass'])?$params['userpass']:"";
+						
+						if(empty($username) && empty($userpass)){
+							returnMsg(405, '参数错误!');
+						}
+						
 						$params = array(
 								'username'=> $username,
 								'userpass'=> $userpass
@@ -46,7 +58,25 @@ function MainPort($params){
 						$rs = $users->register($params);
 						 if($rs){
 							returnMsg(200, '注册成功！have fun');
+						}else{
+							returnMsg(201, '注册失败，请重试！');
+						}
+						break;
+					case 'SAVEBASEINFO';
+						$username = isset($params['username'])?$params['username']:'';
+						if(!empty($username)){
+							$rs = $users->saveBaseInfo($params);
+							if($rs){
+								//查询用户
+								$userinfo = $users->findUserByName($username);
+								
+								returnMsg(200, '保存成功!', array('userinfo'=>$userinfo));
+							}else{
+								returnMsg(201, '保存失败!');
 							}
+						}else{
+							returnMsg(405, '参数错误!');
+						}
 						break;
 					default: 
 						break;

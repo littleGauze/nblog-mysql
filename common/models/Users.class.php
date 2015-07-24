@@ -19,6 +19,7 @@ class Users extends Model{
 			'user_nick',
 			'user_gender',
 			'user_ctime',
+			'user_motto',
 			'user_avator_key'
 		);
 		
@@ -51,6 +52,25 @@ class Users extends Model{
 		
 		return $this->find($dbc);
 		
+	}
+	
+	//保存用户基本信息
+	function saveBaseInfo($params){
+		
+		$username = $params['username'];
+		
+		$datas = array(
+			'user_gender'=>$params['gender'],
+			'user_nick'=>$params['nickname'],
+			'user_motto'=>$params['motto'],
+			'user_avator_key'=>$params['key']
+		);
+		
+		$dbc = new DbCriteria();
+		$dbc->condition = array('user_name'=>':user_name');
+		$dbc->params = array(':user_name'=>$username);
+		
+		return $this->updateData($datas, $dbc);
 	}
 	
 }

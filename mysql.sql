@@ -28,12 +28,13 @@ CREATE TABLE `users` (
   `user_gender` int(1) default '1',
   `user_ctime` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   `user_avator_key` varchar(48) default 'avator',
+  `user_motto` text,
   PRIMARY KEY  (`user_no`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
 /*Data for the table `users` */
 
-insert  into `users`(`user_no`,`user_name`,`user_pass`,`user_nick`,`user_gender`,`user_ctime`,`user_avator_key`) values (1,'admin','daa3db8ffb7dc80a0d02075cd26f0c4e','Gauze',1,'2015-07-22 17:32:53','avator'),(5,'nealli','daa3db8ffb7dc80a0d02075cd26f0c4e',NULL,1,'2015-07-22 17:32:33','avator');
+insert  into `users`(`user_no`,`user_name`,`user_pass`,`user_nick`,`user_gender`,`user_ctime`,`user_avator_key`,`user_motto`) values (1,'admin','daa3db8ffb7dc80a0d02075cd26f0c4e','Gauze',1,'2015-07-24 14:22:02','','anything is possible'),(5,'nealli','daa3db8ffb7dc80a0d02075cd26f0c4e','Gauze007',1,'2015-07-24 15:27:15','nealli/FiX737I97Hst60CV1C31jv9J1a4o6','anything is impossible');
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
