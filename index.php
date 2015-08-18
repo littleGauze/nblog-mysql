@@ -16,7 +16,6 @@ header("Content-Type: text/html;charset=utf8");
 
 if(!empty($auth) && checkAuth($auth)){
 	$params = array_merge($_POST, $_GET);
-	
 	MainPort($params);
 	
 }else{

@@ -77,6 +77,7 @@
 					$joinArray = $this->getRelationByClassName($className, $joinArray);
 					$joinListRtn = array_merge($joinListRtn,$joinArray);
 				}
+				
 			}
 			return $joinListRtn;
 		}

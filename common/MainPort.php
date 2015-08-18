@@ -108,10 +108,14 @@ function MainPort($params){
 			require_once 'models/Posts.class.php';
 			require_once 'models/Users.class.php';
 			require_once 'models/Messages.class.php';
+			require_once 'models/Relations.class.php';
 			$posts = new Posts();
+			$rels = new Relations();
+			$users = new Users();
 			$msg = new Messages();
 			
 			$action = isset($params['action'])?$params['action']:"";
+			
 			if(!empty($action)){
 				switch($action){
 					case 'PUBLISH':
@@ -137,7 +141,8 @@ function MainPort($params){
 						 				'type'=>2,
 						 				'content'=>$desc,
 						 				'ref'=>$rs,
-						 				'from'=>$username
+						 				'from'=>$username,
+						 				'to'=>$username
 						 			);
 						 			//添加一条评论
 						 			$msg->saveMessage($msginfo);
@@ -153,13 +158,21 @@ function MainPort($params){
 						break;
 					case 'MYPOSTS':
 						$username = isset($params['username'])?$params['username']:"";
+						$fans = isset($params['fans'])?$params['fans']:"";
 						$page = isset($params['page'])?$params['page']:1;
 						$limit = isset($params['limit'])?$params['limit']:10;
+						$fallow = false;
 						if(!empty($username)){
+							if(!empty($fans)){
+								//查询关注状态
+								$fallow = $rels->isFallowMe($fans, $username);
+							}
+							//查询用户信息
+							$userinfo = $users->findUserByName($username);
 							$rs = $posts->findPostsByUname($username, $page, intval($limit));
 							
 							if($rs){
-								returnMsg(200, '查询成功!', array('posts'=>$rs));
+								returnMsg(200, '查询成功!', array('posts'=>$rs, 'userinfo'=>$userinfo, 'fallow'=>$fallow));
 							}else{
 								returnMsg(201, '查询失败！');
 							}
@@ -170,13 +183,89 @@ function MainPort($params){
 					case 'ALLPOSTS':
 						$page = isset($params['page'])?$params['page']:1;
 						$limit = isset($params['limit'])?$params['limit']:20;
+						$exclude = isset($params['exclude'])?$params['exclude']:"";
 						
-						$rs = $posts->findAllPosts($page, intval($limit));
-							
+						$rs = $posts->findAllPosts($page, intval($limit), $exclude);
+						
 						if($rs){
 							returnMsg(200, '查询成功!', array('posts'=>$rs));
 						}else{
 							returnMsg(201, '查询失败！');
+						}
+						
+						break;
+					case 'FALLOWPOSTS':
+						$page = isset($params['page'])?$params['page']:1;
+						$limit = isset($params['limit'])?$params['limit']:20;
+						$uname = isset($params['uname'])?$params['uname']:"";
+						
+						if(!empty($uname)){
+							
+							$rs = $posts->findFallowPosts($uname, $page, $limit);
+							if($rs){
+								returnMsg(200, '查询成功!', array('posts'=>$rs));
+							}else{
+								returnMsg(201, '查询失败！');
+							}				
+						}else{
+							returnMsg(405, '参数错误!');
+						}
+						break;
+					default: 
+						break;
+				}
+			}else{
+				returnMsg(405, '参数错误!');
+			}
+			break;
+		case 'relations':
+			//处理帖子相关
+			require_once 'models/Relations.class.php';
+			require_once 'models/Messages.class.php';
+			$rels = new Relations();
+			$msg = new Messages();
+			
+			$action = isset($params['action'])?$params['action']:"";
+			
+			if(!empty($action)){
+				switch($action){
+					case 'FALLOW':
+						$user = isset($params['user'])?$params['user']:"";
+						$me = isset($params['me'])?$params['me']:"";
+						$nick = isset($params['nick'])?$params['nick']:"";
+						
+						$rs = $rels->fallowSomeone($user, $me);
+						
+						if($rs){
+							//添加关注消息
+							$fans = empty($nick)?$me:$nick;
+							$datas = array(
+								'type'=>1,
+								'content'=> '<a href="zone/'.$me.'">'.$fans.'</a> 开始关注您了！',
+								'from'=>$me,
+								'to'=>$user,
+								'ref'=>0
+							);
+							$msg->saveMessage($datas);
+							
+							returnMsg(200, '关注成功!');
+						}else{
+							returnMsg(201, '关注失败！');
+						}
+						break;
+					case 'UNFALLOW':
+						$user = isset($params['user'])?$params['user']:"";
+						$me = isset($params['me'])?$params['me']:"";
+						
+						$rs = $rels->unfallowSomeone($user, $me);
+						
+						if($rs){
+							//删除该用户的系统消息
+							$msg->deleteMessage(1, $me, $user);
+							
+							returnMsg(200, '取消关注成功!');
+						}else{
+							returnMsg(201, '取消关注失败！');
 						}
 						
 						break;
@@ -186,6 +275,80 @@ function MainPort($params){
 			}else{
 				returnMsg(405, '参数错误!');
 			}
+			//fallowSomeone
+			
+			break;
+		case 'message':
+			
+			//处理消息相关
+			require_once 'models/Users.class.php';
+			require_once 'models/Relations.class.php';
+			require_once 'models/Messages.class.php';
+			$users = new Users();
+			$rels = new Relations();
+			$msg = new Messages();
+				
+			$action = isset($params['action'])?$params['action']:"";
+				
+			if(!empty($action)){
+				switch($action){
+					case 'GETALL':
+						$postid = isset($params['postid'])?$params['postid']:"";
+						if($postid){
+							
+							//获取改帖子的所有评论
+							$rs = $msg->getCommentMsg($postid);
+							//解析评论数据
+							$comments = parseComments($rs);
+							
+							if($rs){
+								returnMsg(200, '获取成功!',  array('comments'=>$comments));
+							}else{
+								returnMsg(201, '获取失败！');
+							}
+							
+						}else{
+							returnMsg(405, '参数错误!');
+						}
+						
+						break;
+					case 'COMMENT':
+						$postid = isset($params['postid'])?$params['postid']:"";
+						$content = isset($params['content'])?$params['content']:"";
+						$from = isset($params['from'])?$params['from']:"";
+						$to = isset($params['to'])?$params['to']:"";
+						$parent = isset($params['parent'])?$params['parent']:"";
+						
+						if($postid && $content){
+							//添加评论
+							$datas = array(
+								'type'=>2,
+								'content'=>$content,
+								'from'=>$from,
+								'to'=>$to,
+								'ref'=>$postid,
+								'parent'=>$parent
+							);
+							
+							$rs = $msg->saveMessage($datas);
+							if($rs){
+								returnMsg(200, '评论成功!',  array('from'=>$from, 'to'=>$to, 'msgid'=>$rs));
+							}else{
+								returnMsg(201, '评论失败！');
+							}	
+							
+						}else{
+							returnMsg(405, '参数错误!');
+						}
+						
+						break;
+					default:
+						break;
+				}
+			}else{
+				returnMsg(405, '参数错误!');
+			}
+			
 			break;
 		default: 
 			break;

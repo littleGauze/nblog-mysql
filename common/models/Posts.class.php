@@ -24,7 +24,8 @@ class Posts extends Model{
 	
 	public function relations(){
 		$ralations = array(
-			'Users'=>array('sk'=>'user_name', 'fk'=>'post_user')
+			'Users'=>array('sk'=>'user_name', 'fk'=>'post_user'),
+			'Relations'=>array('sk'=>'relations_star', 'fk'=>'post_user')
 		);
 		
 		return $ralations;
@@ -55,15 +56,38 @@ class Posts extends Model{
 		
 	}
 	
-	//查询所有最新的帖子
-	function findAllPosts($page, $limit){
+	//查询我关注的人的帖子(包括我的)
+	function findFallowPosts($uname, $page, $limit){
 		$start = ($page-1)*$limit;
 		$cdb = new DbCriteria();
+		$cdb->condition = array('OR'=>':or');
+		$condition = array('relations_fans'=>$uname, 'post_user'=>$uname);
+		$cdb->params = array(':or'=> $condition);
 		$cdb->allload = true;
 		$cdb->order = 'post_ctime DESC';
 		$cdb->limit = array($start,$limit);
 		
 		$rs = $this->findAll($cdb);
+		return $rs;
+	}
+	
+	//查询所有最新的帖子
+	function findAllPosts($page, $limit, $exclude=''){
+		$start = ($page-1)*$limit;
+		$cdb = new DbCriteria();
+		
+		if(!empty($exclude)){
+			$cdb->allload = true;
+			$cdb->condition = array('post_user[!]'=>':post_user');
+			$cdb->params = array(':post_user'=>$exclude);
+		}
+		
+		$cdb->allload = true;
+		$cdb->order = 'post_ctime DESC';
+		$cdb->limit = array($start,$limit);
+		
+		$rs = $this->findAll($cdb);
+		
 		return $rs;
 	}
 	

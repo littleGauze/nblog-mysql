@@ -46,11 +46,11 @@ CREATE TABLE `messages` (
   `message_parent` int(11) NOT NULL default '0' COMMENT '0代表评论信息，而不是回复信息',
   `message_disabled` tinyint(1) NOT NULL default '0' COMMENT '当前消息是否可用来计算 赞的次数',
   PRIMARY KEY  (`message_no`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8;
 
 /*Data for the table `messages` */
 
-insert  into `messages`(`message_no`,`message_type`,`message_content`,`message_ctime`,`message_from`,`message_to`,`message_ref`,`message_parent`,`message_disabled`) values (1,2,'this message from the publish.','2015-07-29 15:22:38','nealli',NULL,14,0,0);
+insert  into `messages`(`message_no`,`message_type`,`message_content`,`message_ctime`,`message_from`,`message_to`,`message_ref`,`message_parent`,`message_disabled`) values (1,2,'this message from the publish.','2015-07-29 15:22:38','nealli','nealli',14,0,0),(24,1,'<a href=\"zone/admin\">Gauze</a> 开始关注您了！','2015-08-18 14:39:38','admin','nealli',0,0,0),(26,2,'hello this is from admin.','2015-08-18 16:35:00','admin','nealli',14,0,0),(27,2,'hello this is from admin2.','2015-08-18 16:38:54','admin','nealli',14,0,0),(28,2,'hello this is from admin second.','2015-08-18 16:42:06','admin','nealli',12,0,0),(29,2,'hello there.','2015-08-18 16:49:31','admin','nealli',11,0,0),(30,2,'this pic very nice.','2015-08-18 16:50:34','admin','nealli',9,0,0),(31,2,'yes','2015-08-18 16:51:27','admin','nealli',14,0,0),(32,2,'comment from myself.','2015-08-18 16:52:29','admin','admin',13,0,0),(33,2,'comment myself.','2015-08-18 16:54:08','admin','admin',13,0,0),(34,2,'nice bro.','2015-08-18 17:08:36','nealli','admin',13,0,0);
 
 /*Table structure for table `posts` */
 
@@ -74,13 +74,16 @@ DROP TABLE IF EXISTS `relations`;
 
 CREATE TABLE `relations` (
   `relations_no` int(11) NOT NULL auto_increment,
-  `relations_user` varchar(32) NOT NULL COMMENT '主角的username',
-  `relations_type` int(2) NOT NULL COMMENT '1为我关注的 2为关注我的 3为互相关注的',
-  `ralations_friend` varchar(32) NOT NULL COMMENT '跟我产生关系的人username',
+  `relations_star` varchar(32) NOT NULL COMMENT '主角的username',
+  `relations_eachother` int(2) NOT NULL default '0' COMMENT '0为当方面关注 1为相互关注',
+  `relations_fans` varchar(32) NOT NULL COMMENT '跟我产生关系的人username',
+  `relations_ftime` timestamp NOT NULL default CURRENT_TIMESTAMP COMMENT '关注的时间',
   PRIMARY KEY  (`relations_no`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
 
 /*Data for the table `relations` */
+
+insert  into `relations`(`relations_no`,`relations_star`,`relations_eachother`,`relations_fans`,`relations_ftime`) values (1,'admin',1,'nealli','2015-08-17 16:53:55'),(25,'nealli',1,'admin','2015-08-18 14:39:38');
 
 /*Table structure for table `users` */
 
@@ -95,12 +98,14 @@ CREATE TABLE `users` (
   `user_ctime` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   `user_avator_key` varchar(48) default 'avator',
   `user_motto` text,
+  `user_extension` text,
+  `user_permission` int(48) NOT NULL default '1',
   PRIMARY KEY  (`user_no`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
 /*Data for the table `users` */
 
-insert  into `users`(`user_no`,`user_name`,`user_pass`,`user_nick`,`user_gender`,`user_ctime`,`user_avator_key`,`user_motto`) values (1,'admin','daa3db8ffb7dc80a0d02075cd26f0c4e','Gauze',1,'2015-07-29 16:16:51','nealli/1852B8rf73JOz3t8p2N3E8bP95zR4','anything is possible'),(5,'nealli','daa3db8ffb7dc80a0d02075cd26f0c4e','Gauze007',0,'2015-07-25 16:50:27','nealli/FiX737I97Hst60CV1C31jv9J1a4o6','anything is impossible');
+insert  into `users`(`user_no`,`user_name`,`user_pass`,`user_nick`,`user_gender`,`user_ctime`,`user_avator_key`,`user_motto`,`user_extension`,`user_permission`) values (1,'admin','daa3db8ffb7dc80a0d02075cd26f0c4e','Gauze',1,'2015-08-18 10:34:39','nealli/1852B8rf73JOz3t8p2N3E8bP95zR4','anything is possible',NULL,256),(5,'nealli','daa3db8ffb7dc80a0d02075cd26f0c4e','Gauze007',0,'2015-07-25 16:50:27','nealli/FiX737I97Hst60CV1C31jv9J1a4o6','anything is impossible',NULL,1);
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

@@ -20,7 +20,9 @@ class Users extends Model{
 			'user_gender',
 			'user_ctime',
 			'user_motto',
-			'user_avator_key'
+			'user_avator_key',
+			'user_permission',
+			'user_extension'
 		);
 		
 		return $fields;
@@ -28,7 +30,7 @@ class Users extends Model{
 	
 	public function relations(){
 		$ralations = array(
-			
+				
 		);
 		
 		return $ralations;

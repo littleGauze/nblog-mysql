@@ -61,6 +61,13 @@
     	exit( json_encode($params,JSON_UNESCAPED_UNICODE) );
     }
     
+    //解析评论数据
+    function parseComments($raws){
+    	foreach($raw as $comm){
+    		var_dump($comm['message_no']);
+    	}
+    }
+    
     function getPathInfo($filename) {
     	return pathinfo($filename);
     }

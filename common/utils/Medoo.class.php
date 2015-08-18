@@ -815,8 +815,9 @@ class Medoo
 	public function has($table, $join, $where = null)
 	{
 		$column = null;
-
-		return $this->query('SELECT EXISTS(' . $this->select_context($table, $join, $column, $where, 1) . ')')->fetchColumn() === '1';
+		$rs = $this->query('SELECT EXISTS(' . $this->select_context($table, $join, $column, $where, 1) . ')');
+		
+		return  !$rs?$rs:$rs->fetchColumn() === '1';
 	}
 
 	public function count($table, $join = null, $column = null, $where = null)
