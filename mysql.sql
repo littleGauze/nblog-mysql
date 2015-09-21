@@ -43,14 +43,16 @@ CREATE TABLE `messages` (
   `message_from` varchar(32) NOT NULL,
   `message_to` varchar(32) default NULL,
   `message_ref` int(11) NOT NULL default '0' COMMENT '0代表系统信息，否则是帖子的no',
+  `message_to_nick` varchar(32) default NULL,
+  `message_from_nick` varchar(32) default NULL,
   `message_parent` int(11) NOT NULL default '0' COMMENT '0代表评论信息，而不是回复信息',
   `message_disabled` tinyint(1) NOT NULL default '0' COMMENT '当前消息是否可用来计算 赞的次数',
   PRIMARY KEY  (`message_no`)
-) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8;
 
 /*Data for the table `messages` */
 
-insert  into `messages`(`message_no`,`message_type`,`message_content`,`message_ctime`,`message_from`,`message_to`,`message_ref`,`message_parent`,`message_disabled`) values (1,2,'this message from the publish.','2015-07-29 15:22:38','nealli','nealli',14,0,0),(24,1,'<a href=\"zone/admin\">Gauze</a> 开始关注您了！','2015-08-18 14:39:38','admin','nealli',0,0,0),(26,2,'hello this is from admin.','2015-08-18 16:35:00','admin','nealli',14,0,0),(27,2,'hello this is from admin2.','2015-08-18 16:38:54','admin','nealli',14,0,0),(28,2,'hello this is from admin second.','2015-08-18 16:42:06','admin','nealli',12,0,0),(29,2,'hello there.','2015-08-18 16:49:31','admin','nealli',11,0,0),(30,2,'this pic very nice.','2015-08-18 16:50:34','admin','nealli',9,0,0),(31,2,'yes','2015-08-18 16:51:27','admin','nealli',14,0,0),(32,2,'comment from myself.','2015-08-18 16:52:29','admin','admin',13,0,0),(33,2,'comment myself.','2015-08-18 16:54:08','admin','admin',13,0,0),(34,2,'nice bro.','2015-08-18 17:08:36','nealli','admin',13,0,0);
+insert  into `messages`(`message_no`,`message_type`,`message_content`,`message_ctime`,`message_from`,`message_to`,`message_ref`,`message_to_nick`,`message_from_nick`,`message_parent`,`message_disabled`) values (1,2,'this message from the publish.','2015-07-29 15:22:38','nealli','nealli',14,'Gauze007','Gauze007',0,0),(24,1,'<a href=\"zone/admin\">Gauze</a> 开始关注您了！','2015-08-18 14:39:38','admin','nealli',0,'Gauze007','Gauze',0,0),(26,2,'hello this is from admin.','2015-08-18 16:35:00','admin','nealli',14,'Gauze007','Gauze',0,0),(27,2,'hello this is from admin2.','2015-08-18 16:38:54','admin','nealli',14,'Gauze007','Gauze',0,0),(28,2,'hello this is from admin second.','2015-08-18 16:42:06','admin','nealli',12,'Gauze007','Gauze',0,0),(29,2,'hello there.','2015-08-18 16:49:31','admin','nealli',11,'Gauze007','Gauze',0,0),(30,2,'this pic very nice.','2015-08-18 16:50:34','admin','nealli',9,'Gauze007','Gauze',0,0),(31,2,'yes','2015-08-18 16:51:27','admin','nealli',14,'Gauze007','Gauze',0,0),(32,2,'comment from myself.','2015-08-18 16:52:29','admin','admin',13,'Gauze','Gauze',0,0),(33,2,'comment myself.','2015-08-18 16:54:08','admin','admin',13,'Gauze','Gauze',0,0),(34,2,'nice bro.','2015-08-18 17:08:36','nealli','admin',13,'Gauze','Gauze007',0,0),(35,2,'very nice.','2015-09-21 14:44:14','nealli','admin',13,'Gauze','Gauze007',0,0),(36,2,'It\'s OK.','2015-09-21 15:33:51','admin','nealli',10,'Gauze007','Gauze',0,0),(37,2,'hello Gauze','2015-09-21 16:56:42','nealli','nealli',14,'Gauze007','Gauze007',0,0),(38,2,'6','2015-09-21 17:07:47','nealli','nealli',6,'Gauze007','Gauze007',0,0),(39,2,'6','2015-09-21 17:08:00','nealli','nealli',6,'Gauze007','Gauze007',0,0),(40,2,'hello Gauze final.','2015-09-21 17:27:01','nealli','admin',14,'Gauze','Gauze007',27,0);
 
 /*Table structure for table `posts` */
 
