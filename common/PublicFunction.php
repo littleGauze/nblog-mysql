@@ -63,8 +63,8 @@
     
     //解析评论数据
     function parseComments($raws){
-    	foreach($raw as $comm){
-    		var_dump($comm['message_no']);
+    	foreach($raws as $comm){
+    		
     	}
     }
     

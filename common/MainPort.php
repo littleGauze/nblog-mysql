@@ -121,6 +121,7 @@ function MainPort($params){
 					case 'PUBLISH':
 						
 						$username = isset($params['username'])?$params['username']:"";
+						$nick = isset($params['nick'])?$params['nick']:"";
 						$key = isset($params['key'])?$params['key']:"";
 						$desc = isset($params['desc'])?$params['desc']:"";
 						
@@ -142,7 +143,9 @@ function MainPort($params){
 						 				'content'=>$desc,
 						 				'ref'=>$rs,
 						 				'from'=>$username,
-						 				'to'=>$username
+						 				'to'=>$username,
+						 				'fnick'=>$nick,
+						 				'tnick'=>$nick
 						 			);
 						 			//添加一条评论
 						 			$msg->saveMessage($msginfo);
@@ -298,8 +301,13 @@ function MainPort($params){
 							
 							//获取改帖子的所有评论
 							$rs = $msg->getCommentMsg($postid);
+							
 							//解析评论数据
-							$comments = parseComments($rs);
+							if($rs){
+								$comments = $rs;
+							}else{
+								$comments = array();
+							}
 							
 							if($rs){
 								returnMsg(200, '获取成功!',  array('comments'=>$comments));
@@ -316,7 +324,9 @@ function MainPort($params){
 						$postid = isset($params['postid'])?$params['postid']:"";
 						$content = isset($params['content'])?$params['content']:"";
 						$from = isset($params['from'])?$params['from']:"";
+						$fnick = isset($params['fnick'])?$params['fnick']:"";
 						$to = isset($params['to'])?$params['to']:"";
+						$tnick = isset($params['tnick'])?$params['tnick']:"";
 						$parent = isset($params['parent'])?$params['parent']:"";
 						
 						if($postid && $content){
@@ -325,7 +335,9 @@ function MainPort($params){
 								'type'=>2,
 								'content'=>$content,
 								'from'=>$from,
+								'fnick'=>$fnick,
 								'to'=>$to,
+								'tnick'=>$tnick,
 								'ref'=>$postid,
 								'parent'=>$parent
 							);

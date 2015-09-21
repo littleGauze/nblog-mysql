@@ -42,7 +42,9 @@ class Messages extends Model{
 			'message_type'=>$params['type'],
 			'message_content'=>$params['content'],
 			'message_from'=>$params['from'],
-			'message_to'=>$params['to']
+			'message_from_nick'=>$params['fnick'],
+			'message_to'=>$params['to'],
+			'message_to_nick'=>$params['tnick']
 		);
 		
 		if($params['ref']){
@@ -80,13 +82,19 @@ class Messages extends Model{
 	//获取消息
 	function getCommentMsg($postid){
 		$cdb = new DbCriteria();
-		$cdb->condition = array('message_ref'=>':ref', 'message_type'=>':type');
-		$cdb->params = array(':ref'=> $postid, ':type'=>2);
-		$cdb->order = 'message_ctime DESC';
+		
+		$cdb->condition = array("AND"=>":and");
+		$condition = array();
+		
+		$condition['message_ref'] = $postid;
+		$condition['message_type'] = 2;
+		
+		$cdb->params = array(':and'=> $condition);
 		$cdb->limit = array(0, 100000);
 		
-		$rs = $this->finAll(DbCriteria);
+		$rs = $this->findAll($cdb);
 		
+		return $rs;
 	}
 	
 	//获取被赞的次数
