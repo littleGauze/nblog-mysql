@@ -286,6 +286,7 @@ function MainPort($params){
 			//处理消息相关
 			require_once 'models/Users.class.php';
 			require_once 'models/Relations.class.php';
+			require_once 'models/Posts.class.php';
 			require_once 'models/Messages.class.php';
 			$users = new Users();
 			$rels = new Relations();
@@ -299,20 +300,23 @@ function MainPort($params){
 						$postid = isset($params['postid'])?$params['postid']:"";
 						if($postid){
 							
-							//获取改帖子的所有评论
+							//获取该帖子的所有评论
 							$rs = $msg->getCommentMsg($postid);
+							
+							//获取该帖子的点赞次数
+							$count = $msg->getLikeCount($postid);
 							
 							//解析评论数据
 							if($rs){
-								$comments = $rs;
+								$comments = parseComments($rs);
 							}else{
 								$comments = array();
 							}
 							
 							if($rs){
-								returnMsg(200, '获取成功!',  array('comments'=>$comments));
+								returnMsg(200, '获取成功!',  array('comments'=>$comments, 'likes'=>$count));
 							}else{
-								returnMsg(201, '获取失败！');
+								returnMsg(201, '获取失败！', array('likes'=>$count));
 							}
 							
 						}else{
@@ -352,7 +356,59 @@ function MainPort($params){
 						}else{
 							returnMsg(405, '参数错误!');
 						}
+						break;
+					case 'LIKE':
+						$postid = isset($params['postid'])?$params['postid']:"";
+						$from = isset($params['from'])?$params['from']:"";
+						$fnick = isset($params['fnick'])?$params['fnick']:"";
+						$to = isset($params['to'])?$params['to']:"";
+						$tnick = isset($params['tnick'])?$params['tnick']:"";
+						$content = '<a href="zone/'.$from.'">'.$fnick.'</a> 赞了您的说说!';
 						
+						if($msg->isliked($postid, $from)){
+							returnMsg(200, '点赞成功!');
+						}
+						
+						if($postid && $content){
+							//添加评论
+							$datas = array(
+									'type'=>3,
+									'content'=>$content,
+									'from'=>$from,
+									'fnick'=>$fnick,
+									'to'=>$to,
+									'tnick'=>$tnick,
+									'ref'=>$postid
+							);
+								
+							$rs = $msg->saveMessage($datas);
+							if($rs){
+								returnMsg(200, '点赞成功!');
+							}else{
+								returnMsg(201, '点赞失败！');
+							}
+								
+						}else{
+							returnMsg(405, '参数错误!');
+						}
+						break;
+					case 'MYMSG':
+						$user = isset($params['user'])?$params['user']:"";
+						$page = isset($params['page'])?$params['page']:1;
+						$limit = isset($params['limit'])?$params['limit']:10;
+						
+						$start = ($page-1)*$limit;
+						if($user){
+							$rs = $msg->getMsgAboutMe($user, $start, $limit);
+							if($rs){
+								returnMsg(200, '获取成功!', array('messages'=>$rs));
+							}else{
+								returnMsg(201, '获取失败！');
+							}
+						
+						}else{
+							returnMsg(405, '参数错误!');
+						}
 						break;
 					default:
 						break;

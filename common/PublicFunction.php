@@ -63,9 +63,19 @@
     
     //解析评论数据
     function parseComments($raws){
+    	$comments = array();
     	foreach($raws as $comm){
-    		
+    		if($comm['message_parent'] != 0) continue;
+    		$msgno = $comm['message_no'];
+    		$comments[] = $comm;
+    		foreach($raws as $filter){
+    			if($filter['message_parent'] == 0) continue;
+    			if($filter['message_parent'] == $msgno){
+    				$comments[] = $filter;
+    			}
+    		}
     	}
+    	return $comments;
     }
     
     function getPathInfo($filename) {

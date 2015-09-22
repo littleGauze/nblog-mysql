@@ -97,9 +97,56 @@ class Messages extends Model{
 		return $rs;
 	}
 	
-	//获取被赞的次数
-	function getLikeCount($postid){
+	//查询是否已点赞
+	function isliked($postid, $user){
+		$cdb = new DbCriteria();
 		
+		$cdb->condition = array("AND"=>":and");
+		$condition = array();
+		
+		$condition['message_ref'] = $postid;
+		$condition['message_type'] = 3;
+		$condition['message_from'] = $user;
+		
+		$cdb->params = array(':and'=> $condition);
+		
+		$rs = $this->hasData($cdb);
+		
+		return $rs;
 	}
 	
+	//获取被赞的次数
+	function getLikeCount($postid){
+		$cdb = new DbCriteria();
+		
+		$cdb->condition = array("AND"=>":and");
+		$condition = array();
+		
+		$condition['message_ref'] = $postid;
+		$condition['message_type'] = 3;
+		
+		$cdb->params = array(':and'=> $condition);
+		
+		$rs = $this->dataCount($cdb);
+		
+		return $rs;
+	}
+	
+	//获取与我相关的消息
+	function getMsgAboutMe($user, $start, $count){
+		
+		$rs = $this->select($this->tableName, array(
+					'[>]posts'=> array('message_to'=>'post_user'),
+					'[>]users'=> array('message_from'=>'user_name')
+				), 
+				'*',
+				array(
+					'message_to' => $user,
+					'ORDER'=>'message_ctime DESC',
+					'LIMIT'=>array($start, $count)
+				)
+		);
+		
+		return $rs;
+	}
 }

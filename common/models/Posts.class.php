@@ -68,6 +68,7 @@ class Posts extends Model{
 		$cdb->limit = array($start,$limit);
 		
 		$rs = $this->findAll($cdb);
+		
 		return $rs;
 	}
 	
