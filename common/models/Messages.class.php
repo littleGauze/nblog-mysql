@@ -21,7 +21,8 @@ class Messages extends Model{
 			'message_to',
 			'message_ref',
 			'message_parent',
-			'message_disabled'
+			'message_disabled',
+			'message_readed'
 		);
 		
 		return $fields;
@@ -136,12 +137,15 @@ class Messages extends Model{
 	function getMsgAboutMe($user, $start, $count){
 		
 		$rs = $this->select($this->tableName, array(
-					'[>]posts'=> array('message_to'=>'post_user'),
+					'[>]posts'=> array('message_ref'=>'post_no'),
 					'[>]users'=> array('message_from'=>'user_name')
 				), 
 				'*',
 				array(
-					'message_to' => $user,
+					'AND'=> array(
+						'message_to' => $user,
+						'message_from[!]'=>$user,
+					),
 					'ORDER'=>'message_ctime DESC',
 					'LIMIT'=>array($start, $count)
 				)
@@ -149,4 +153,21 @@ class Messages extends Model{
 		
 		return $rs;
 	}
+	
+	//获取留言信息
+	function getLeaveMsg(){
+		$cdb = new DbCriteria();
+		
+		$cdb->condition = array("AND"=>":and");
+		$condition = array();
+		$condition['message_type'] = 4;
+		
+		$cdb->params = array(':and'=> $condition);
+		$cdb->limit = array(0, 100000);
+		
+		$rs = $this->findAll($cdb);
+		
+		return $rs;
+	}
+	
 }

@@ -129,7 +129,8 @@ function MainPort($params){
 							
 							$data = array(
 								'username'=>$username,
-								'key'=>$key
+								'key'=>$key,
+								'desc'=>$desc
 							);
 							
 							$rs = $posts->publish($data);
@@ -244,7 +245,7 @@ function MainPort($params){
 							$fans = empty($nick)?$me:$nick;
 							$datas = array(
 								'type'=>1,
-								'content'=> '<a href="zone/'.$me.'">'.$fans.'</a> 开始关注您了！',
+								'content'=> $fans.' 开始关注您了！',
 								'from'=>$me,
 								'to'=>$user,
 								'ref'=>0
@@ -363,7 +364,7 @@ function MainPort($params){
 						$fnick = isset($params['fnick'])?$params['fnick']:"";
 						$to = isset($params['to'])?$params['to']:"";
 						$tnick = isset($params['tnick'])?$params['tnick']:"";
-						$content = '<a href="zone/'.$from.'">'.$fnick.'</a> 赞了您的说说!';
+						$content = $fnick.' 赞了您的说说!';
 						
 						if($msg->isliked($postid, $from)){
 							returnMsg(200, '点赞成功!');
@@ -409,6 +410,43 @@ function MainPort($params){
 						}else{
 							returnMsg(405, '参数错误!');
 						}
+						break;
+					case 'LEAVEMSG':
+						$parent = isset($params['parent'])?$params['parent']:0;
+						$content = isset($params['content'])?$params['content']:'';
+					
+						//添加评论
+						$datas = array(
+								'type'=>4,
+								'content'=>$content,
+								'parent'=>$parent,
+								'from'=> 'guest',
+								'fnick'=> '游客',
+								'to'=> 'admin',
+								'tnick'=> '管理员',
+								'ref'=>0
+						);
+							
+						$rs = $msg->saveMessage($datas);
+						if($rs){
+							returnMsg(200, '留言成功!', array('msgid'=>$rs));
+						}else{
+							returnMsg(201, '留言失败！');
+						}
+					
+						break;
+					case 'GETLEAVEMSG':
+						
+						$rs = $msg->getLeaveMsg();
+						
+						$rs = parseLeaveMsg($rs);
+						
+						if($rs){
+							returnMsg(200, '获取成功!', array('messages'=> $rs));
+						}else{
+							returnMsg(201, '获取失败！');
+						}
+							
 						break;
 					default:
 						break;

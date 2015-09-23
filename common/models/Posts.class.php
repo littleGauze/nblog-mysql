@@ -16,7 +16,8 @@ class Posts extends Model{
 			'post_no',
 			'post_img_key',
 			'post_ctime',
-			'post_user'
+			'post_user',
+			'post_desc'
 		);
 		
 		return $fields;
@@ -36,7 +37,8 @@ class Posts extends Model{
 		
 		$datas = array(
 			'post_img_key'=>$params['key'],
-			'post_user'=>$params['username']
+			'post_user'=>$params['username'],
+			'post_desc'=>$params['desc']
 		);
 		
 		return $this->insertData($datas);

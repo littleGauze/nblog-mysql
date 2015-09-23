@@ -78,6 +78,27 @@
     	return $comments;
     }
     
+    //解析留言数据
+    function parseLeaveMsg($raws){
+    	$msgs = array();
+    	foreach($raws as $msg){
+    		if($msg['message_parent'] != 0) continue;
+    		$msg['replys'] = array();
+    		foreach ($raws as $sub){
+    			if($sub['message_parent'] == 0) continue;
+    			if($msg['message_no'] == $sub['message_parent']){
+    				$msg['replys'][] = $sub;
+    			}
+    		}
+    		
+    		if($msg['message_parent'] == 0){
+    			$msgs[] = $msg;
+    		}
+    	}
+    	
+    	return $msgs;
+    }
+    
     function getPathInfo($filename) {
     	return pathinfo($filename);
     }
