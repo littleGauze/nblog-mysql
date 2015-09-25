@@ -145,6 +145,7 @@ class Messages extends Model{
 					'AND'=> array(
 						'message_to' => $user,
 						'message_from[!]'=>$user,
+						'message_type[!]'=>4
 					),
 					'ORDER'=>'message_ctime DESC',
 					'LIMIT'=>array($start, $count)

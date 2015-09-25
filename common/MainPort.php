@@ -94,6 +94,31 @@ function MainPort($params){
 							returnMsg(405, '参数错误!');
 						}
 						break;
+					case 'CHANGEPASS';
+						$username = isset($params['username'])?$params['username']:'';
+						$oldpass = isset($params['oldpassword'])?$params['oldpassword']:'';
+						$newpass = isset($params['newpassword'])?$params['newpassword']:'';
+						if(!empty($username) && !empty($oldpass) && !empty($newpass)){
+							
+							//查询旧密码是否正确
+							$user = $users->findUserByName($username);
+							
+							if($user && $user['user_pass'] == md5($oldpass)){
+								$rs = $users->changeUserPass($username, $newpass);
+								
+								if($rs){
+									returnMsg(200, '修改密码成功!');
+								}else{
+									returnMsg(201, '修改密码失败!');
+								}
+								
+							}else{
+								returnMsg(202, '旧密码错误！');
+							}
+						}else{
+							returnMsg(405, '参数错误!');
+						}
+						break;
 					default: 
 						break;
 				}
@@ -164,7 +189,7 @@ function MainPort($params){
 						$username = isset($params['username'])?$params['username']:"";
 						$fans = isset($params['fans'])?$params['fans']:"";
 						$page = isset($params['page'])?$params['page']:1;
-						$limit = isset($params['limit'])?$params['limit']:10;
+						$limit = isset($params['limit'])?$params['limit']:20;
 						$fallow = false;
 						if(!empty($username)){
 							if(!empty($fans)){
@@ -247,7 +272,9 @@ function MainPort($params){
 								'type'=>1,
 								'content'=> $fans.' 开始关注您了！',
 								'from'=>$me,
+								'fnick'=>'',
 								'to'=>$user,
+								'tnick'=>'',
 								'ref'=>0
 							);
 							$msg->saveMessage($datas);
@@ -272,6 +299,54 @@ function MainPort($params){
 							returnMsg(201, '取消关注失败！');
 						}
 						
+						break;
+					case 'GETFRIENDS':
+						$user = isset($params['user'])?$params['user']:"";
+						$page = isset($params['page'])?$params['page']:1;
+						$limit = isset($params['limit'])?$params['limit']:20;
+						
+						$start = ($page-1)*$limit;
+						
+						$rs = $rels->getFriends($user, $start, $limit);
+						
+						if($rs){
+							returnMsg(200, '获取成功!', array('lists'=>$rs));
+						}else{
+							returnMsg(201, '获取失败！');
+						}
+						
+						break;
+					case 'FALLOWING'://所有关注我的用户
+						$user = isset($params['user'])?$params['user']:"";
+						$page = isset($params['page'])?$params['page']:1;
+						$limit = isset($params['limit'])?$params['limit']:20;
+					
+						$start = ($page-1)*$limit;
+					
+						$rs = $rels->findAllFans($user, $start, $limit);
+					
+						if($rs){
+							returnMsg(200, '获取成功!', array('lists'=>$rs));
+						}else{
+							returnMsg(201, '获取失败！');
+						}
+					
+						break;
+					case 'FALLOWED'://所有我关注的用户
+						$user = isset($params['user'])?$params['user']:"";
+						$page = isset($params['page'])?$params['page']:1;
+						$limit = isset($params['limit'])?$params['limit']:20;
+					
+						$start = ($page-1)*$limit;
+					
+						$rs = $rels->findAllStars($user, $start, $limit);
+					
+						if($rs){
+							returnMsg(200, '获取成功!', array('lists'=>$rs));
+						}else{
+							returnMsg(201, '获取失败！');
+						}
+					
 						break;
 					default: 
 						break;

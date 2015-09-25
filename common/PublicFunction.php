@@ -99,6 +99,21 @@
     	return $msgs;
     }
     
+    //解析好友列表数据
+    function parseFirends($fallowing, $fallowed){
+    	$list = array();
+    	
+    	foreach($fallowed as $fans){
+    		if($fans['relations_eachother'] == 1 ) continue;
+    		
+    		$list[] = $fans;
+    	}
+    	
+    	$list = array_merge($list, $fallowing);
+    	
+    	return $list;
+    }
+    
     function getPathInfo($filename) {
     	return pathinfo($filename);
     }

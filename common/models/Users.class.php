@@ -56,6 +56,21 @@ class Users extends Model{
 		
 	}
 	
+	//修改用户密码
+	function changeUserPass($name, $password){
+		$dbc = new DbCriteria();
+		
+		$datas = array(
+			'user_pass'=> md5($password)
+		);
+		
+		$dbc->condition = array('user_name'=>':user_name');
+		$dbc->params = array(':user_name'=>$name);
+		
+		return $this->updateData($datas, $dbc);
+		
+	}
+	
 	//保存用户基本信息
 	function saveBaseInfo($params){
 		

@@ -130,7 +130,7 @@ class Medoo
 	{
 		$query = str_replace('"','`',$query);
 		$this->queryString = $query;
-
+		
 		return $this->pdo->query($query);
 	}
 

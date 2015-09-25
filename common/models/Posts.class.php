@@ -61,15 +61,13 @@ class Posts extends Model{
 	//查询我关注的人的帖子(包括我的)
 	function findFallowPosts($uname, $page, $limit){
 		$start = ($page-1)*$limit;
-		$cdb = new DbCriteria();
-		$cdb->condition = array('OR'=>':or');
-		$condition = array('relations_fans'=>$uname, 'post_user'=>$uname);
-		$cdb->params = array(':or'=> $condition);
-		$cdb->allload = true;
-		$cdb->order = 'post_ctime DESC';
-		$cdb->limit = array($start,$limit);
+		$sql = 'SELECT * FROM %s LEFT JOIN users ON user_name=post_user ';
+		$sql .= 'WHERE post_user in (SELECT relations_star FROM relations WHERE relations_fans=%s) OR post_user=%s ';
+		$sql .= 'ORDER BY post_ctime DESC ';
+		$sql .= 'LIMIT '.$start.','.$limit;
+		$sql = sprintf($sql, $this->tableName, $this->quote($uname), $this->quote($uname));
 		
-		$rs = $this->findAll($cdb);
+		$rs = $this->query($sql)->fetchAll();
 		
 		return $rs;
 	}
@@ -77,19 +75,18 @@ class Posts extends Model{
 	//查询所有最新的帖子
 	function findAllPosts($page, $limit, $exclude=''){
 		$start = ($page-1)*$limit;
-		$cdb = new DbCriteria();
-		
+		$where = '';
+		$sql = 'SELECT * FROM %s LEFT JOIN users ON user_name=post_user ';
 		if(!empty($exclude)){
-			$cdb->allload = true;
-			$cdb->condition = array('post_user[!]'=>':post_user');
-			$cdb->params = array(':post_user'=>$exclude);
+			$where = 'WHERE post_user=%s ';
+			$where = sprintf($where, $this->quote($exclude));
 		}
-		
-		$cdb->allload = true;
-		$cdb->order = 'post_ctime DESC';
-		$cdb->limit = array($start,$limit);
-		
-		$rs = $this->findAll($cdb);
+		$sql .= $where;
+		$sql .= 'ORDER BY post_ctime DESC ';
+		$sql .= 'LIMIT '.$start.','.$limit;
+		$sql = sprintf($sql, $this->tableName);
+
+		$rs = $this->query($sql)->fetchAll();
 		
 		return $rs;
 	}
